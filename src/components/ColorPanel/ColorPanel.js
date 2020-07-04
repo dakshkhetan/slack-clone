@@ -1,5 +1,7 @@
 import React from 'react';
 import firebase from '../../firebase';
+import { connect } from 'react-redux';
+import { setColors } from '../../actions';
 // prettier-ignore
 import { Sidebar, Menu, Divider, Button, Modal, Icon, Label, Segment } from "semantic-ui-react";
 import { SliderPicker } from 'react-color';
@@ -58,7 +60,10 @@ class ColorPanel extends React.Component {
     colors.map((color, i) => (
       <React.Fragment key={i}>
         <Divider />
-        <div className='color__container'>
+        <div
+          className='color__container'
+          onClick={() => this.props.setColors(color.primary, color.secondary)}
+        >
           <div className='color__square' style={{ background: color.primary }}>
             <div
               className='color__overlay'
@@ -123,4 +128,4 @@ class ColorPanel extends React.Component {
   }
 }
 
-export default ColorPanel;
+export default connect(null, { setColors })(ColorPanel);
