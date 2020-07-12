@@ -10,7 +10,14 @@ class UserPanel extends React.Component {
     modal: false,
     previewImage: '',
     croppedImage: '',
-    blob: ''
+    blob: null,
+    uploadedCroppedImage: '',
+    storageRef: firebase.storage().ref(),
+    userRef: firebase.auth().currentUser,
+    usersRef: firebase.database().ref('users'),
+    metadata: {
+      contentType: 'image/jpeg'
+    }
   };
 
   openModal = () => this.setState({ modal: true });
@@ -36,6 +43,45 @@ class UserPanel extends React.Component {
       text: <span onClick={this.handleSignout}>Sign Out</span>
     }
   ];
+
+  uploadCroppedImage = () => {
+    const { storageRef, userRef, blob, metadata } = this.state;
+
+    storageRef
+      .child(`avatars/user-${userRef.uid}`)
+      .put(blob, metadata)
+      .then((snap) => {
+        snap.ref.getDownloadURL().then((downloadURL) => {
+          this.setState({ uploadedCroppedImage: downloadURL }, () =>
+            this.changeAvatar()
+          );
+        });
+      });
+  };
+
+  changeAvatar = () => {
+    this.state.userRef
+      .updateProfile({
+        photoURL: this.state.uploadedCroppedImage
+      })
+      .then(() => {
+        console.log('PhotoURL updated');
+        this.closeModal();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    this.state.usersRef
+      .child(this.state.user.uid)
+      .update({ avatar: this.state.uploadedCroppedImage })
+      .then(() => {
+        console.log('User avatar updated');
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   handleChange = (event) => {
     const file = event.target.files[0];
@@ -136,7 +182,11 @@ class UserPanel extends React.Component {
             </Modal.Content>
             <Modal.Actions>
               {croppedImage && (
-                <Button color='green' inverted>
+                <Button
+                  color='green'
+                  inverted
+                  onClick={this.uploadCroppedImage}
+                >
                   <Icon name='save' /> Change Avatar
                 </Button>
               )}
