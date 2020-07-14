@@ -55,14 +55,6 @@
         }
       }
     },
-    "presence": {
-      ".read": "auth != null",
-      ".write": "auth != null"
-    },
-    "typing": {
-      ".read": "auth != null",
-      ".write": "auth != null"
-    },
     "users": {
       ".read": "auth != null",
       "$uid": {
@@ -75,6 +67,14 @@
           ".validate": "newData.val().length > 0"
         }
       }
+    },
+    "presence": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "typing": {
+      ".read": "auth != null",
+      ".write": "auth != null"
     }
   }
 }
